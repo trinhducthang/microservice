@@ -1,5 +1,6 @@
 package com.ducthang.accountbankservice.controller;
 
+import com.ducthang.accountbankservice.dto.request.ProfileCreationRequest;
 import com.ducthang.accountbankservice.dto.response.ApiResponse;
 import com.ducthang.accountbankservice.UserProfile;
 import com.ducthang.accountbankservice.httpclient.ProfileClient;
@@ -9,22 +10,22 @@ import org.springframework.core.ParameterizedTypeReference;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
+@RequestMapping("/api/bank")
+public class BankController {
 
     private final WebClient webClient;
 
     private final ProfileClient profileClient;
 
     // Constructor nhận WebClient.Builder để cấu hình WebClient
-    public UserController(WebClient.Builder webClientBuilder, ProfileClient profileClient) {
+    public BankController(WebClient.Builder webClientBuilder, ProfileClient profileClient) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build(); // URL của dịch vụ bên ngoài
         this.profileClient = profileClient;
     }
 
     // Định nghĩa API endpoint của microservice của bạn
-    @GetMapping("/{id}")
-    public Mono<ApiResponse<UserProfile>> getUserProfile(@PathVariable String id) {
+    @PutMapping("/{id}")
+    public Mono<ApiResponse<UserProfile>> getUserProfile(@PathVariable String id, @RequestParam String bank) {
         try{
             return webClient.get()
                     .uri("/profile/internal/users/{id}", id) // Thay thế {id} bằng ID người dùng
@@ -40,6 +41,13 @@ public class UserController {
                             // Trả về ApiResponse<UserProfile>
                             var profile = new UserProfile();
                             profile = response.getResult();
+
+                            ProfileCreationRequest request = new ProfileCreationRequest();
+                            request.setLastName(profile.getLastName());
+                            request.setFirstName(profile.getFirstName());
+                            request.setBanks(bank);
+
+                            profileClient.createProfile(request,id);
 
 
                             return Mono.just(response);
