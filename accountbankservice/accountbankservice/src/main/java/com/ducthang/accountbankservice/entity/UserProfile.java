@@ -1,4 +1,4 @@
-package com.ducthang.accountbankservice;
+package com.ducthang.accountbankservice.entity;
 
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;

@@ -1,13 +1,17 @@
 package com.ducthang.profile.controller;
 
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.ducthang.profile.dto.ApiResponse;
 import com.ducthang.profile.dto.request.ProfileCreationRequest;
 import com.ducthang.profile.dto.response.UserProfileResponse;
 import com.ducthang.profile.service.UserProfileService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,9 +34,11 @@ public class InternalUserProfileController {
     }
 
     @GetMapping("/internal/users/{userId}")
-    ApiResponse<UserProfileResponse> getProfile(@PathVariable String userId) {
-        return ApiResponse.<UserProfileResponse>builder()
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(@PathVariable String userId) {
+        ApiResponse<UserProfileResponse> response = ApiResponse.<UserProfileResponse>builder()
                 .result(userProfileService.getByUserId(userId))
                 .build();
+
+        return ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(response);
     }
 }

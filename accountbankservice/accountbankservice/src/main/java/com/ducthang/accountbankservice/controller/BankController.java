@@ -2,8 +2,11 @@ package com.ducthang.accountbankservice.controller;
 
 import com.ducthang.accountbankservice.dto.request.ProfileCreationRequest;
 import com.ducthang.accountbankservice.dto.response.ApiResponse;
-import com.ducthang.accountbankservice.UserProfile;
-import com.ducthang.accountbankservice.httpclient.ProfileClient;
+import com.ducthang.accountbankservice.entity.Bank;
+import com.ducthang.accountbankservice.entity.UserProfile;
+import com.ducthang.accountbankservice.repository.httpclient.ProfileClient;
+import com.ducthang.accountbankservice.service.AccountBankService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,18 +20,21 @@ public class BankController {
 
     private final ProfileClient profileClient;
 
+    private final AccountBankService accountBankService;
+
     // Constructor nhận WebClient.Builder để cấu hình WebClient
-    public BankController(WebClient.Builder webClientBuilder, ProfileClient profileClient) {
+    public BankController(WebClient.Builder webClientBuilder, ProfileClient profileClient, AccountBankService accountBankService) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build(); // URL của dịch vụ bên ngoài
         this.profileClient = profileClient;
+        this.accountBankService = accountBankService;
     }
 
     // Định nghĩa API endpoint của microservice của bạn
-    @PutMapping("/{id}")
-    public Mono<ApiResponse<UserProfile>> getUserProfile(@PathVariable String id, @RequestParam String bank) {
+    @PostMapping("/{id}")
+    public Mono<ApiResponse<UserProfile>> getUserProfile(@PathVariable String id, @RequestBody Bank bank) {
         try{
             return webClient.get()
-                    .uri("/profile/internal/users/{id}", id) // Thay thế {id} bằng ID người dùng
+                    .uri("/profile/users/{id}", id) // Thay thế {id} bằng ID người dùng
                     .retrieve()  // Thực hiện GET request
                     .onStatus(status -> status.value() == 404, clientResponse -> {
                         // Nếu status là 404, trả về ApiResponse với thông báo không tồn tại
@@ -41,14 +47,18 @@ public class BankController {
                             // Trả về ApiResponse<UserProfile>
                             var profile = new UserProfile();
                             profile = response.getResult();
-
-                            ProfileCreationRequest request = new ProfileCreationRequest();
-                            request.setLastName(profile.getLastName());
-                            request.setFirstName(profile.getFirstName());
-                            request.setBanks(bank);
-
-                            profileClient.createProfile(request,id);
-
+                            if(profile.getBanks() == null){
+                                ProfileCreationRequest request = new ProfileCreationRequest();
+                                request.setEmail(profile.getEmail());
+                                request.setLastName(profile.getLastName());
+                                request.setFirstName(profile.getFirstName());
+                                request.setDob(profile.getDob());
+                                request.setCity(profile.getCity());
+                                String bankNumber = bank.getNumber();
+                                request.setBanks(bankNumber);
+                                accountBankService.createBank(bank,id);
+                                profileClient.createProfile(request,id);
+                            }
 
                             return Mono.just(response);
                         }
@@ -65,5 +75,11 @@ public class BankController {
             return Mono.just(new ApiResponse<>(4000, "User not found"));
         }
     }
+
+    @GetMapping("/{userProfileId}")
+    public Bank getBank(@PathVariable String userProfileId) {
+        return accountBankService.getBankByUserProfileId(userProfileId);
+    }
+
 
 }

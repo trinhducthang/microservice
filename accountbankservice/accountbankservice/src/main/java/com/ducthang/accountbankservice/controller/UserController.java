@@ -1,13 +1,15 @@
 package com.ducthang.accountbankservice.controller;
 
 import com.ducthang.accountbankservice.dto.response.ApiResponse;
-import com.ducthang.accountbankservice.UserProfile;
-import com.ducthang.accountbankservice.httpclient.ProfileClient;
+import com.ducthang.accountbankservice.entity.UserProfile;
+import com.ducthang.accountbankservice.repository.httpclient.ProfileClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.core.ParameterizedTypeReference;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -27,7 +29,7 @@ public class UserController {
     public Mono<ApiResponse<UserProfile>> getUserProfile(@PathVariable String id) {
         try{
             return webClient.get()
-                    .uri("/profile/internal/users/{id}", id) // Thay thế {id} bằng ID người dùng
+                    .uri("/profile/users/{id}", id) // Thay thế {id} bằng ID người dùng
                     .retrieve()  // Thực hiện GET request
                     .onStatus(status -> status.value() == 404, clientResponse -> {
                         // Nếu status là 404, trả về ApiResponse với thông báo không tồn tại
@@ -41,7 +43,7 @@ public class UserController {
                             var profile = new UserProfile();
                             profile = response.getResult();
 
-
+                            log.info("profile: {}", profile.getId());
                             return Mono.just(response);
                         }
                         else if(response.getCode() == 1005){

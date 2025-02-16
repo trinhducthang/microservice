@@ -10,4 +10,3 @@ public class ProfileServiceApplication {
         SpringApplication.run(ProfileServiceApplication.class, args);
     }
 }
-    

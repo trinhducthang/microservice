@@ -1,7 +1,7 @@
 package com.ducthang.profile.service;
 
-import com.ducthang.profile.exception.AppException;
-import com.ducthang.profile.exception.ErrorCode;
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.ducthang.profile.dto.request.ProfileCreationRequest;
 import com.ducthang.profile.dto.response.UserProfileResponse;
 import com.ducthang.profile.entity.UserProfile;
+import com.ducthang.profile.exception.AppException;
+import com.ducthang.profile.exception.ErrorCode;
 import com.ducthang.profile.mapper.UserProfileMapper;
 import com.ducthang.profile.repository.UserProfileRepository;
 
@@ -16,8 +18,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,17 +35,25 @@ public class UserProfileService {
     }
 
     public UserProfileResponse getByUserId(String userId) {
-        UserProfile userProfile =
-                userProfileRepository.findByUserId(userId)
-                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        UserProfile userProfile = userProfileRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userProfileMapper.toUserProfileReponse(userProfile);
     }
 
-    public UserProfileResponse updateUser(ProfileCreationRequest request ,String id) {
+    public UserProfileResponse updateUser(ProfileCreationRequest request, String id) {
         UserProfile userProfile =
-                userProfileRepository.findByUserId(id)
-                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                userProfileRepository.findByUserId(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userProfile = userProfileMapper.toUserProfile(request);
+        userProfile.setId(id);
+        userProfile = userProfileRepository.save(userProfile);
+        userProfileRepository.save(userProfile);
+        return userProfileMapper.toUserProfileReponse(userProfile);
+    }
+
+    public UserProfileResponse updateUserById(ProfileCreationRequest request, String id) {
+        UserProfile userProfile = userProfileRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userProfile = userProfileMapper.toUserProfile(request);
         userProfile.setId(id);
         userProfile = userProfileRepository.save(userProfile);
@@ -55,8 +63,7 @@ public class UserProfileService {
 
     public UserProfileResponse getProfile(String id) {
         UserProfile userProfile =
-                userProfileRepository.findById(id).orElseThrow(
-                        () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                userProfileRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userProfileMapper.toUserProfileReponse(userProfile);
     }
@@ -72,7 +79,8 @@ public class UserProfileService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        var profile = userProfileRepository.findByUserId(userId)
+        var profile = userProfileRepository
+                .findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userProfileMapper.toUserProfileReponse(profile);
