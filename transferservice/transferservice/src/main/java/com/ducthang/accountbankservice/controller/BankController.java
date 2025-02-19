@@ -1,12 +1,9 @@
 package com.ducthang.accountbankservice.controller;
 
-import com.ducthang.accountbankservice.dto.request.ProfileCreationRequest;
 import com.ducthang.accountbankservice.dto.response.ApiResponse;
 import com.ducthang.accountbankservice.entity.Bank;
-import com.ducthang.accountbankservice.entity.UserProfile;
 import com.ducthang.accountbankservice.repository.httpclient.ProfileClient;
-import com.ducthang.accountbankservice.service.AccountBankService;
-import org.springframework.http.ResponseEntity;
+import com.ducthang.accountbankservice.service.TransferService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,13 +17,13 @@ public class BankController {
 
     private final ProfileClient profileClient;
 
-    private final AccountBankService accountBankService;
+    private final TransferService transferService;
 
     // Constructor nhận WebClient.Builder để cấu hình WebClient
-    public BankController(WebClient.Builder webClientBuilder, ProfileClient profileClient, AccountBankService accountBankService) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build(); // URL của dịch vụ bên ngoài
+    public BankController(WebClient.Builder webClientBuilder, ProfileClient profileClient, TransferService transferService) {
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8082").build(); // URL của dịch vụ bên ngoài
         this.profileClient = profileClient;
-        this.accountBankService = accountBankService;
+        this.transferService = transferService;
     }
 
     // Định nghĩa API endpoint của microservice của bạn
@@ -81,14 +78,6 @@ public class BankController {
         return accountBankService.getBankByUserProfileId(userProfileId);
     }
 
-    @PutMapping("/{bankNumber}")
-    public Bank updateBank(@PathVariable String bankNumber, @RequestParam long amount) {
-        return accountBankService.updateBank(bankNumber,amount);
-    }
+    
 
-
-    @GetMapping("/number/{number}")
-    public Bank getBankByNumber(@PathVariable String number) {
-        return accountBankService.getBankByNumber(number);
-    }
 }

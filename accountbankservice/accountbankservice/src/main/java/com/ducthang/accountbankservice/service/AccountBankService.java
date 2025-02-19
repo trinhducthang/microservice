@@ -29,4 +29,15 @@ public class AccountBankService {
     public Bank getBankByUserProfileId(String userProfileId) {
         return bankRepository.findBanksByUserProfileId(userProfileId);
     }
+
+    public Bank updateBank(String bankNumber, long amount) {
+        Bank bank = bankRepository.findByNumber(bankNumber);
+        bank.setBalance(amount);
+        return bankRepository.save(bank);
+    }
+
+    public Bank getBankByNumber(String bankNumber) {
+        return bankRepository.findByNumber(bankNumber);
+    }
+
 }

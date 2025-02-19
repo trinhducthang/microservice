@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BankRepository extends JpaRepository<Bank, Long> {
     Bank getBanksById(Long id);
+    Bank findByNumber(String number);
     Bank findBanksByUserProfileId(String userProfileId);
     boolean existsBanksByUserProfileId(String userProfileId);
     boolean existsBanksByNumber(String number);
