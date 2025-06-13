@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/microservice/bank-service/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice/api-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice/file-service/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice/identity-service/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice/notification-service/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice/post-service/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice/profile-service/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21_PREVIEW" project-jdk-name="ms-21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

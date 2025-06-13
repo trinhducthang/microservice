@@ -1,0 +1,10 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /banks
+spring:
+  application:
+    name: bank-service
+  data:
+    mongodb:
+      uri: mongodb://admin:admin123@localhost:27017/bank-service?authSource=admin
