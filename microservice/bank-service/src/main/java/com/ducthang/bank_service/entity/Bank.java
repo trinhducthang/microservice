@@ -1,6 +1,7 @@
 package com.ducthang.bank_service.entity;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Bank {
     private String id;
 
     private String userId;
+    @NotNull
     private long bankNumber;
     private String nickName;
     private BigDecimal amount;
